@@ -1,24 +1,53 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Daily Room Joiner</title>
+    <title>Tavus - Custom Meeting End Message Demo</title>
     <script src="https://unpkg.com/@daily-co/daily-js"></script>
     <style>
       body { font-family: sans-serif; text-align: center; padding: 2rem; }
       iframe { width: 100%; height: 500px; border: none; margin-top: 1rem; }
+      .links { margin: 1rem 0; }
+      .explainer { max-width: 800px; margin: 0 auto 2rem; text-align: left; }
     </style>
   </head>
   <body>
-    <h1>Join a Daily Room</h1>
+    <h1>Tavus - Custom Meeting End Message Demo</h1>
+    
+    <div class="links">
+      <a href="https://github.com/andy-tavus/custom_ending_message" target="_blank">View Source Code</a> | 
+      <a href="https://docs.tavus.io" target="_blank">Tavus Documentation</a>
+    </div>
+
+    <div class="explainer">
+      <h3>How to Customize Meeting End Messages</h3>
+      <p>By default, Daily.co shows generic messages like "You've left the call" and "Have a nice day!" when a meeting ends. This demo shows how to replace those with custom messages.</p>
+      <ol>
+        <li>Enter a Daily.co room URL in the input field below</li>
+        <li>Click "Join" to start the meeting</li>
+        <li>When the meeting ends, instead of the default messages, you'll see custom messages for:
+          <ul>
+            <li>User leaving: "You left the meeting."</li>
+            <li>Error: "The meeting ended due to an error."</li>
+            <li>Host ending: "The meeting was ended by the host."</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
     <input type="text" id="roomUrl" placeholder="Enter Daily room URL" size="50">
     <button onclick="joinRoom()">Join</button>
     <div id="meetingArea"></div>
-    <div id="endMessage" style="display:none; margin-top:1rem; font-weight:bold;">
-      This is a custom ending message!
-    </div>
+    <div id="endMessage" style="display:none; margin-top:1rem; font-weight:bold;"></div>
 
     <script>
       let callFrame;
+
+      function showEndMessage(msg) {
+        document.getElementById('meetingArea').innerHTML = '';
+        const messageBox = document.getElementById('endMessage');
+        messageBox.textContent = msg;
+        messageBox.style.display = 'block';
+      }
 
       function joinRoom() {
         const url = document.getElementById('roomUrl').value;
@@ -37,8 +66,17 @@
         callFrame.join({ url });
 
         callFrame.on('left-meeting', () => {
-          area.innerHTML = '';
-          document.getElementById('endMessage').style.display = 'block';
+          showEndMessage('You left the meeting.');
+        });
+
+        callFrame.on('error', (e) => {
+          showEndMessage('The meeting ended due to an error.');
+        });
+
+        callFrame.on('nonfatal-error', (e) => {
+          if (e?.action === 'end-meeting') {
+            showEndMessage('The meeting was ended by the host.');
+          }
         });
       }
     </script>
