@@ -104,11 +104,17 @@
     <script>
       let callFrame;
 
+      /**
+       * Shows a custom end message by:
+       * 1. Clearing the Daily.co iframe (removes their default message)
+       * 2. Displaying our custom message div
+       * 3. Setting the message text
+       */
       function showEndMessage(msg) {
-        document.getElementById('meetingArea').innerHTML = '';
+        document.getElementById('meetingArea').innerHTML = '';  // Remove Daily.co's default UI
         const messageBox = document.getElementById('endMessage');
         messageBox.textContent = msg;
-        messageBox.style.display = 'block';
+        messageBox.style.display = 'block';  // Show our custom message
       }
 
       function joinRoom() {
@@ -116,6 +122,7 @@
         const area = document.getElementById('meetingArea');
         area.innerHTML = ''; // Clear previous frame
 
+        // Create the Daily.co iframe
         callFrame = window.DailyIframe.createFrame(area, {
           showLeaveButton: true,
           iframeStyle: {
@@ -127,14 +134,22 @@
 
         callFrame.join({ url });
 
+        // Set up event listeners to intercept meeting end scenarios
+        // These fire before Daily.co shows their default messages,
+        // allowing us to clear the iframe and show our own message instead
+
+        // Scenario 1: User clicks leave button or closes tab
         callFrame.on('left-meeting', () => {
           showEndMessage('You left the meeting.');
         });
 
+        // Scenario 2: Connection error or other technical issues
         callFrame.on('error', (e) => {
           showEndMessage('The meeting ended due to an error.');
         });
 
+        // Scenario 3: Host ends the meeting for everyone
+        // This comes through as a nonfatal-error with a specific action
         callFrame.on('nonfatal-error', (e) => {
           if (e?.action === 'end-meeting') {
             showEndMessage('The meeting was ended by the host.');

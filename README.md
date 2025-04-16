@@ -22,17 +22,30 @@ The implementation uses Daily.co's JavaScript SDK to:
 - Listen for meeting end events
 - Replace the default end messages with custom ones based on the end scenario
 
+### How It Works
+
+The key to replacing Daily.co's default end messages is timing and DOM manipulation:
+
+1. We set up event listeners that fire before Daily.co shows their default messages
+2. When an end event occurs, we immediately:
+   - Clear the Daily.co iframe from the DOM (`meetingArea.innerHTML = ''`)
+   - Show our own message div instead
+   - This prevents Daily.co's default UI from appearing
+
 ### Key Components
 
 1. **HTML Structure**
-   - Input field for the Daily.co room URL
-   - Container for the meeting iframe
-   - Message display area for end messages
+   ```html
+   <!-- Container for Daily.co's iframe -->
+   <div id="meetingArea"></div>
+   <!-- Our custom message div (hidden by default) -->
+   <div id="endMessage" style="display:none;"></div>
+   ```
 
 2. **Event Listeners**
    - `left-meeting`: Triggered when user leaves the meeting
    - `error`: Triggered when an error ends the meeting
-   - `nonfatal-error`: Triggered when host ends the meeting
+   - `nonfatal-error`: Triggered when host ends the meeting (check for `action === 'end-meeting'`)
 
 3. **Message Display**
    - Uses a dedicated div that's hidden by default
@@ -45,7 +58,7 @@ The implementation uses Daily.co's JavaScript SDK to:
 2. Open `index.html` in a web browser
 3. Enter a valid Daily.co room URL
 4. Click "Join" to start the meeting
-5. Test different end scenarios to see the custom messages
+5. Test different end scenarios to see custom messages
 
 ## Customization
 
