@@ -2,9 +2,7 @@
 
 This demo shows how to implement custom end messages for Tavus video meetings using Daily.co's JavaScript SDK.
 
-## Live Example
-
-https://andy-tavus.github.io/custom_ending_message/
+[LIVE DEMO](https://andy-tavus.github.io/custom_ending_message/)
 
 ## Overview
 
